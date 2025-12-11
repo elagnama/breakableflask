@@ -5,9 +5,8 @@ FROM python:3.7.17-slim AS base
 WORKDIR /app
 
 # Installe les dépendances système (avec versions figées)
-RUN apt-get update && \
-    apt-get install -y gcc=4:9.3.0-1 libpq-dev=11.21-1+deb10u1 && \
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends gcc libpq-dev
+
 
 # Copie les fichiers dans l'image
 COPY requirements.txt .
