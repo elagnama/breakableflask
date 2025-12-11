@@ -27,6 +27,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip freeze > requirements-pinné.txt
     - name: Lint with flake8
       run: |
         sudo apt-get install wget gnupg
@@ -34,10 +35,8 @@ jobs:
         echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
         sudo apt-get update
         sudo apt-get install trivy
-        pip3 install cyclonedx-bom
-        cyclonedx-py requirements -i requirements.txt -o sbom.json
     - name: Scan Trivy
       run: |
-         trivy sbom --scanners vuln --exit-code 1 sbom.json
+         trivy --scanners vuln --exit-code 1 requirements-pinné.txt 
          
          
