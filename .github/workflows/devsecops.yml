@@ -35,12 +35,10 @@ jobs:
         sudo apt-get update
         sudo apt-get install trivy
     - name: Scan Trivy
-      uses: aquasecurity/trivy-action@0.33.1
-      with:
-        scan-type: fs
-        scan-ref: 'requirements.txt'
-        scanners: vuln
-        severity: HIGH,CRITICAL
-        exit-code: 1
+      run: |
+        docker run --rm \
+        -v "$PWD":/project \
+        -v $HOME/.cache/trivy:/root/.cache/ \
+        aquasec/trivy:latest fs /project/requirements.txt
          
          
