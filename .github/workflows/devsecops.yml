@@ -29,7 +29,18 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Lint with flake8
       run: |
-        docker run --rm \
-        -v "$PWD":/project \
-        -v $HOME/.cache/trivy:/root/.cache/ \
-        aquasec/trivy:latest fs requirements.txt
+        sudo apt-get install wget gnupg
+        wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
+        echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+        sudo apt-get update
+        sudo apt-get install trivy
+    - name: Scan Trivy
+      uses: aquasecurity/trivy-action@v0.2.3
+      with:
+        scan-type: fs
+        scan-ref: venv
+        scanners: vuln
+        severity: HIGH,CRITICAL
+        exit-code: 1
+         
+         
