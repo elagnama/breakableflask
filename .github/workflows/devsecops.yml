@@ -27,16 +27,11 @@ jobs:
         pip install cyclonedx-bom
         cyclonedx-py requirements -i requirements.txt -o sbom.json
 
-        
-    - name: Scanner le SBOM
-      uses: aquasecurity/trivy-action@master
-      with:
-          scan-type: sbom
-          input: sbom.json
-          scanners: vuln
-          severity: CRITICAL,HIGH
-          format: table
-          exit-code: 1
+    - name: Scan Trivy
+      run: |
+         trivy sbom --scanners vuln --exit-code 1 sbom.json
+
+         
   Dockerfile:
       name: Scanner Dockerfile
       runs-on: ubuntu-latest
