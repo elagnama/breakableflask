@@ -28,12 +28,14 @@ jobs:
         cyclonedx-py requirements -i requirements.txt -o sbom.json
 
         
-    - name: Run Trivy vulnerability scanner in fs mode
-      uses: aquasecurity/trivy-action@0.33.1
+    - name: Scanner le SBOM
+      uses: aquasecurity/trivy-action@master
       with:
-        scan-type: 'fs'
-        scan-ref: '.'
-        trivy-config: trivy.yaml
+          scan-type: sbom
+          sbom: sbom.json
+          format: table
+          scanners: vuln
+          exit-code: 1
   Dockerfile:
       name: Scanner Dockerfile
       runs-on: ubuntu-latest
@@ -54,3 +56,12 @@ jobs:
           uses: hadolint/hadolint-action@v3.2.0
           with:
             dockerfile: Dockerfile
+            
+        - name: Analyse Trivy de l'image Docker
+          uses: aquasecurity/trivy-action@master
+          with:
+            scan-type: config
+            scan-ref: Dockerfile
+            scanners: config
+            format: table
+            exit-code: 0
