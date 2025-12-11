@@ -1,6 +1,3 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
-
 name: Python application
 
 on:
@@ -13,41 +10,31 @@ permissions:
   contents: read
 
 jobs:
-  Dependances:
+  build:
+
     runs-on: ubuntu-latest
-    name: Analyse complète des dépendances Python
 
     steps:
-      - name: Checkout du dépôt
-        uses: actions/checkout@v4
-
-      - name: Vérifier la présence de requirements.txt
-        run: |
-          if [ ! -f requirements.txt ]; then
-            echo "❌ requirements.txt introuvable"
-            exit 1
-          fi
-
-      - name: Installer Python et créer un virtualenv
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-venv python3-pip
-          python3 -m venv venv
-          source venv/bin/activate
-          pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Installer Trivy
-        run: |
-          sudo apt-get install -y wget gnupg
-          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
-          echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main" | sudo tee /etc/apt/sources.list.d/trivy.list
-          sudo apt-get update
-          sudo apt-get install -y trivy
-
-      - name: Scanner le virtualenv avec Trivy
-        run: |
-          trivy fs --exit-code 1 "$SITE_PACKAGES"
- 
-         
-         
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.10"
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip freeze > requirements-pinné.txt
+    - name: Lint with flake8
+      run: |
+        sudo apt-get install wget gnupg
+        wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
+        echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+        sudo apt-get update
+        sudo apt-get install trivy
+        pip install cyclonedx-bom
+        cyclonedx-py requirements -i requirements.txt -o sbom.json
+        
+    - name: Scan Trivy
+      run: |
+         trivy sbom --scanners vuln --exit-code 1 sbom.json
