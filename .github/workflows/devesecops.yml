@@ -1,1 +1,20 @@
+name: Automatisation des tests DevSecOps
+on:
+  push:
+    branches:
+    - master
 
+jobs:  
+  Dependances:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Installer les dependances python via requirements.txt
+      - run: |
+          docker run --rm \
+          -v "$PWD":/project \
+          -v $HOME/.cache/trivy:/root/.cache/ \
+          aquasec/trivy:latest fs /project/requirements.txt
+        
+    
+    
+    
