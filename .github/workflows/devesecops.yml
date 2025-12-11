@@ -8,6 +8,7 @@ jobs:
   Dependances:
     runs-on: ubuntu-22.04
     steps:
+      - uses: actions/checkout@v5
       - name: Installer les dependances python via requirements.txt
       - run: |
           docker run --rm \
