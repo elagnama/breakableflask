@@ -56,6 +56,6 @@ jobs:
             fi
   
         - name: Lint du Dockerfile avec Hadolint
-          uses: hadolint/hadolint-action@v2.1.0
+          uses: hadolint/hadolint-action@v3.2.0
           with:
             dockerfile: Dockerfile
