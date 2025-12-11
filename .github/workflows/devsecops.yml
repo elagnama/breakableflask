@@ -24,22 +24,8 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Generate Trivy Vulnerability Report
-      uses: aquasecurity/trivy-action@master
-      with:
-          scan-type: "fs"
-          output: trivy-report.json
-          format: json
-          scan-ref: .
-          exit-code: 0
-
-    - name: Upload Vulnerability Scan Results
-      uses: actions/upload-artifact@v4
-      with:
-          name: trivy-report
-          path: trivy-report.json
-          retention-days: 30
-
+        pip install cyclonedx-bom
+        cyclonedx-py requirements -i requirements.txt -o sbom.json
     - name: Fail build on High/Criticial Vulnerabilities
       uses: aquasecurity/trivy-action@master
       with:
