@@ -1,8 +1,5 @@
 name: Automatisation des tests DevSecOps
-on:
-  push:
-    branches:
-    - master
+on: push
 
 jobs:  
   Dependances:
