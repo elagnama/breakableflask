@@ -38,7 +38,7 @@ jobs:
       uses: aquasecurity/trivy-action@0.33.1
       with:
         scan-type: fs
-        scan-ref: venv
+        scan-ref: '.'
         scanners: vuln
         severity: HIGH,CRITICAL
         exit-code: 1
