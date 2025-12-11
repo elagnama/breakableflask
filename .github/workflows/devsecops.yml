@@ -47,7 +47,7 @@ jobs:
 
       - name: Scanner le virtualenv avec Trivy
         run: |
-          trivy fs --exit-code 1 venv
+          trivy fs --exit-code 1 "$SITE_PACKAGES"
  
          
          
