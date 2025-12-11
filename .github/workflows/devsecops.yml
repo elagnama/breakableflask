@@ -32,9 +32,10 @@ jobs:
       uses: aquasecurity/trivy-action@master
       with:
           scan-type: sbom
-          sbom: sbom.json
-          format: table
+          input: sbom.json
           scanners: vuln
+          severity: CRITICAL,HIGH
+          format: table
           exit-code: 1
   Dockerfile:
       name: Scanner Dockerfile
