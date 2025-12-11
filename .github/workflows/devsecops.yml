@@ -35,7 +35,7 @@ jobs:
         sudo apt-get update
         sudo apt-get install trivy
     - name: Scan Trivy
-      uses: aquasec/trivy:latest
+      uses: aquasecurity/trivy-action@0.33.1
       with:
         scan-type: fs
         scan-ref: venv
