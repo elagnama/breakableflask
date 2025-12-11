@@ -26,17 +26,14 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         pip install cyclonedx-bom
         cyclonedx-py requirements -i requirements.txt -o sbom.json
-    - name: Fail build on High/Criticial Vulnerabilities
-      uses: aquasecurity/trivy-action@master
+
+        
+    - name: Run Trivy vulnerability scanner in fs mode
+      uses: aquasecurity/trivy-action@0.33.1
       with:
-          scan-type: "fs"
-          format: table
-          scan-ref: .
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true
-          exit-code: 1
-          # On a subsequent call to the action we know trivy is already installed so can skip this
-          skip-setup-trivy: true
+        scan-type: 'fs'
+        scan-ref: '.'
+        trivy-config: trivy.yaml
   Dockerfile:
       name: Scanner Dockerfile
       runs-on: ubuntu-latest
