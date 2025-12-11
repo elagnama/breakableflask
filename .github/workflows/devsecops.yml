@@ -24,12 +24,33 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Aqua Security Trivy
-      uses: aquasecurity/trivy-action@0.33.1
+    - name: Generate Trivy Vulnerability Report
+      uses: aquasecurity/trivy-action@master
       with:
-        scan-type: 'fs'
-        scan-ref: '.'
-        trivy-config: trivy.yaml
+          scan-type: "fs"
+          output: trivy-report.json
+          format: json
+          scan-ref: .
+          exit-code: 0
+
+    - name: Upload Vulnerability Scan Results
+      uses: actions/upload-artifact@v4
+      with:
+          name: trivy-report
+          path: trivy-report.json
+          retention-days: 30
+
+    - name: Fail build on High/Criticial Vulnerabilities
+      uses: aquasecurity/trivy-action@master
+      with:
+          scan-type: "fs"
+          format: table
+          scan-ref: .
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: 1
+          # On a subsequent call to the action we know trivy is already installed so can skip this
+          skip-setup-trivy: true
   Dockerfile:
       name: Scanner Dockerfile
       runs-on: ubuntu-latest
