@@ -35,8 +35,11 @@ jobs:
         echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
         sudo apt-get update
         sudo apt-get install trivy
+        pip install cyclonedx-bom
+        cyclonedx-py requirements -i requirements.txt -o sbom.json
+        
     - name: Scan Trivy
       run: |
-         trivy fs --scanners vuln --exit-code 1 requirements-pinné.txt 
+         trivy sbom --scanners vuln --exit-code 1 sbom.json 
          
          
