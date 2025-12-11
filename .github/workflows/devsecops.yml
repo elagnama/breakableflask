@@ -36,6 +36,6 @@ jobs:
         sudo apt-get install trivy
     - name: Scan Trivy
       run: |
-         trivy fs  --scanners vuln,secret,misconfig  --severity HIGH,CRITICAL --exit-code 1 breakableflask/requirements.txt
+         trivy fs  --scanners vuln,secret,misconfig  --severity HIGH,CRITICAL --exit-code 1 /breakableflask/requirements.txt
          
          
