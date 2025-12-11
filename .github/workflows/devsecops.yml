@@ -38,6 +38,6 @@ jobs:
         cyclonedx-py requirements -i requirements.txt -o sbom.json
     - name: Scan Trivy
       run: |
-         trivy sbom --format cyclonedx --exit-code 1 sbom.json
+         trivy sbom --scanners vuln --exit-code 1 sbom.json
          
          
