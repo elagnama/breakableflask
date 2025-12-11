@@ -35,7 +35,7 @@ jobs:
         sudo apt-get update
         sudo apt-get install trivy
         pip3 install cyclonedx-bom
-        cyclonedx-py -r requirements.txt -o sbom.json
+        cyclonedx-py requirements -i requirements.txt -o sbom.json
     - name: Scan Trivy
       run: |
          trivy sbom --format cyclonedx --exit-code 1 sbom.json
