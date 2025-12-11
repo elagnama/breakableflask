@@ -32,4 +32,4 @@ jobs:
         docker run --rm \
         -v "$PWD":/project \
         -v $HOME/.cache/trivy:/root/.cache/ \
-        aquasec/trivy:latest fs /project/requirements.txt
+        aquasec/trivy:latest fs requirements.txt
