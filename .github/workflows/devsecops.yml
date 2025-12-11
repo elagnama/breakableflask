@@ -37,6 +37,6 @@ jobs:
         sudo apt-get install trivy
     - name: Scan Trivy
       run: |
-         trivy --scanners vuln --exit-code 1 requirements-pinné.txt 
+         trivy fs --scanners vuln --exit-code 1 requirements-pinné.txt 
          
          
