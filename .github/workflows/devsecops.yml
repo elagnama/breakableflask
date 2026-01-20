@@ -60,8 +60,8 @@ jobs:
           template: 'trivy.tpl'       # On utilise le fichier créé juste au-dessus
           output: 'rapport-trivy.md'
           severity: 'CRITICAL,HIGH'
-         ignore-unfixed: true
-         
+          ignore-unfixed: true
+
       # 3. Affichage dans le résumé GitHub
     - name: Résumé du scan
       if: always()
