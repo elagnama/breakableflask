@@ -32,10 +32,29 @@ jobs:
         pip install cyclonedx-bom
         cyclonedx-py requirements -i requirements.txt -o sbom.json
 
+    - name: Création du template Markdown
+      run: |
+          cat <<EOF > trivy.tpl
+          {{- range . }}
+          ### Cible : {{ .Target }}
+          | Package | ID | Sévérité | Version Installée | Version Corrigée |
+          | --- | --- | --- | --- | --- |
+          {{- range .Vulnerabilities }}
+          | {{ .PkgName }} | {{ .VulnerabilityID }} | {{ .Severity }} | {{ .InstalledVersion }} | {{ .FixedVersion }} |
+          {{- end }}
+          {{- end }}
+          EOF
+
     - name: Scan Trivy
       run: |
-         trivy sbom --scanners vuln --exit-code 1 sbom.json
-
+         trivy sbom --scanners vuln --exit-code 1 --output rapport-trivy.txt sbom.json
+    
+    - name: Upload de l'artefact MD
+      uses: actions/upload-artifact@v4
+      if: always() 
+      with:
+          name: rapport-sbom-md
+          path: rapport-trivy.md
          
   Dockerfile:
       name: Scanner Dockerfile
