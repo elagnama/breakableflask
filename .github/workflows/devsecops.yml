@@ -47,7 +47,7 @@ jobs:
 
     - name: Scan Trivy
       run: |
-         trivy sbom --scanners vuln --exit-code 1 --output rapport-trivy.txt sbom.json
+         trivy sbom --scanners vuln --exit-code 1 --output rapport-trivy.md sbom.json
     
     - name: Upload de l'artefact MD
       uses: actions/upload-artifact@v4
