@@ -31,54 +31,11 @@ jobs:
         sudo apt-get install trivy
         pip install cyclonedx-bom
         cyclonedx-py requirements -i requirements.txt -o sbom.json
-    
 
-    - name: Récupération du code
-      uses: actions/checkout@v4
-
-      # 1. On CRÉE le template manuellement (plus de lien cassé !)
-    - name: Création du template Trivy
+    - name: Scan Trivy
       run: |
-          cat <<EOF > trivy.tpl
-          {{- range . }}
-          ### Cible : {{ .Target }}
-          | Package | ID | Sévérité | Version Installée | Version Corrigée |
-          | --- | --- | --- | --- | --- |
-          {{- range .Vulnerabilities }}
-          | {{ .PkgName }} | {{ .VulnerabilityID }} | {{ .Severity }} | {{ .InstalledVersion }} | {{ .FixedVersion }} |
-          {{- end }}
-          {{- end }}
-          EOF
+         trivy sbom --scanners vuln --exit-code 1 sbom.json
 
-      # 2. Scan Trivy avec notre template local
-    - name: Scan des dépendances
-      uses: aquasecurity/trivy-action@master
-      with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          format: 'template'
-          template: 'trivy.tpl'       # On utilise le fichier créé juste au-dessus
-          output: 'rapport-trivy.md'
-          severity: 'CRITICAL,HIGH'
-          ignore-unfixed: true
-
-      # 3. Affichage dans le résumé GitHub
-    - name: Résumé du scan
-      if: always()
-      run: |
-          if [ -f rapport-trivy.md ]; then
-            cat rapport-trivy.md >> $GITHUB_STEP_SUMMARY
-          else
-            echo "⚠️ Aucun rapport généré ou erreur lors du scan." >> $GITHUB_STEP_SUMMARY
-          fi
-
-      # 4. Sauvegarde du fichier
-    - name: Upload du rapport
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-          name: rapport-securite-md
-          path: rapport-trivy.md     
          
   Dockerfile:
       name: Scanner Dockerfile
@@ -108,14 +65,4 @@ jobs:
             scan-ref: Dockerfile
             scanners: config
             format: table
-            template: '@/contrib/markdown.tpl'
-            output: 'rapport-trivy.md'
             exit-code: 0
-        
-        - name: Upload du rapport
-          if: always() 
-          uses: actions/upload-artifact@v4
-          with:
-              name: rapport-vulnerabilites
-              path: rapport-trivy.md
-  
