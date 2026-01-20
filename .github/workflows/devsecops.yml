@@ -32,16 +32,23 @@ jobs:
         pip install cyclonedx-bom
         cyclonedx-py requirements -i requirements.txt -o sbom.json
     
+
     - name: Récupération du code
       uses: actions/checkout@v4
 
+      # 1. On télécharge le template Markdown officiel de Trivy
+    - name: Télécharger le Template Markdown
+      run: |
+          wget https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/markdown.tpl -O trivy-markdown.tpl
+
+      # 2. On lance le scan en pointant vers le fichier qu'on vient de télécharger
     - name: Scan des dépendances (requirements.txt)
       uses: aquasecurity/trivy-action@master
       with:
-          scan-type: 'fs'             # <--- CHANGEMENT ICI : 'fs' pour Filesystem
-          scan-ref: '.'               # <--- Scanne le dossier courant (trouvera requirements.txt tout seul)
+          scan-type: 'fs'
+          scan-ref: '.'
           format: 'template'
-          template: '@/contrib/markdown.tpl'
+          template: 'trivy-markdown.tpl' # <--- On utilise le fichier local
           output: 'rapport-trivy.md'
           severity: 'CRITICAL,HIGH'
           ignore-unfixed: true
@@ -49,16 +56,18 @@ jobs:
     - name: Afficher le rapport dans le résumé
       if: always()
       run: |
-        if [ -f rapport-trivy.md ]; then
+          if [ -f rapport-trivy.md ]; then
             cat rapport-trivy.md >> $GITHUB_STEP_SUMMARY
-        fi
+          else
+            echo "Aucun rapport généré (erreur probable)" >> $GITHUB_STEP_SUMMARY
+          fi
 
     - name: Upload du rapport MD
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: rapport-securite-md
-        path: rapport-trivy.md     
+          name: rapport-securite-md
+          path: rapport-trivy.md     
          
   Dockerfile:
       name: Scanner Dockerfile
