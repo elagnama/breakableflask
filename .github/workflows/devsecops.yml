@@ -85,3 +85,48 @@ jobs:
             scanners: config
             format: table
             exit-code: 0
+        
+        - name: Création du template IaC (Dockerfile)
+          run: |
+            cat <<EOF > trivy-iac.tpl
+            {{- range . }}
+            ### Cible : {{ .Target }}
+            | ID | Sévérité | Message |
+            | --- | --- | --- |
+            {{- range .Misconfigurations }}
+            | {{ .ID }} | {{ .Severity }} | {{ .Message }} |
+            {{- end }}
+            {{- end }}
+            EOF
+        - name: Création du template IaC (Dockerfile)
+          run: |
+            cat <<EOF > trivy-iac.tpl
+            {{- range . }}
+            ### Cible : {{ .Target }}
+            | ID | Sévérité | Message |
+            | --- | --- | --- |
+            {{- range .Misconfigurations }}
+            | {{ .ID }} | {{ .Severity }} | {{ .Message }} |
+            {{- end }}
+            {{- end }}
+            EOF
+
+      # 2. Votre étape Trivy modifiée pour générer le fichier
+        - name: Analyse Trivy de l'image Docker
+          uses: aquasecurity/trivy-action@master
+          with:
+            scan-type: 'config'
+            scan-ref: 'Dockerfile'
+            scanners: 'config'      # Force le scanneur de configuration
+            format: 'template'      # On veut utiliser le template
+            template: 'trivy-iac.tpl' # Le fichier créé juste au-dessus
+            output: 'rapport-dockerfile.md' # Le fichier de sortie
+            exit-code: 0            # 0 = Ne fait pas échouer le job (changez à 1 si vous voulez bloquer)
+
+      # 3. Récupération de l'artefact
+        - name: Upload du rapport Dockerfile
+          uses: actions/upload-artifact@v4
+          if: always()
+          with:
+            name: rapport-audit-dockerfile
+            path: rapport-dockerfile.md
