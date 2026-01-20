@@ -141,5 +141,5 @@ jobs:
           uses: actions/upload-artifact@v4
           if: always()
           with:
-            name: rapport-audit-dockerfile
+            name: rapport-dockerfile-scan
             path: rapport-dockerfile.md
