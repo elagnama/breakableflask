@@ -32,23 +32,33 @@ jobs:
         pip install cyclonedx-bom
         cyclonedx-py requirements -i requirements.txt -o sbom.json
     
+    - name: Récupération du code
+      uses: actions/checkout@v4
 
-    - name: Scan Trivy
+    - name: Scan des dépendances (requirements.txt)
       uses: aquasecurity/trivy-action@master
       with:
-          image-ref: 'mon-app:latest'  # <--- REMPLACEZ PAR LE NOM DE VOTRE IMAGE
+          scan-type: 'fs'             # <--- CHANGEMENT ICI : 'fs' pour Filesystem
+          scan-ref: '.'               # <--- Scanne le dossier courant (trouvera requirements.txt tout seul)
           format: 'template'
           template: '@/contrib/markdown.tpl'
           output: 'rapport-trivy.md'
           severity: 'CRITICAL,HIGH'
           ignore-unfixed: true
-    
-    - name: Upload du rapport
-      if: always() 
+
+    - name: Afficher le rapport dans le résumé
+      if: always()
+      run: |
+        if [ -f rapport-trivy.md ]; then
+            cat rapport-trivy.md >> $GITHUB_STEP_SUMMARY
+        fi
+
+    - name: Upload du rapport MD
+      if: always()
       uses: actions/upload-artifact@v4
       with:
-          name: rapport-vulnerabilites
-          path: rapport-trivy.md     
+        name: rapport-securite-md
+        path: rapport-trivy.md     
          
   Dockerfile:
       name: Scanner Dockerfile
