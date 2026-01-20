@@ -66,3 +66,30 @@ jobs:
             scanners: config
             format: table
             exit-code: 0
+  security-trivy:
+    name: Security Scan (Trivy)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # Nécessaire pour checkout
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Scan Trivy (FS & Dockerfile)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'template'
+          template: '@/contrib/html.tpl'
+          output: 'trivy-report.html'
+          severity: 'CRITICAL,HIGH'
+          ignore-unfixed: true
+
+      - name: Upload du rapport HTML
+        uses: actions/upload-artifact@v4
+        if: always() # Important : Upload même si Trivy trouve des failles
+        with:
+          name: rapport-securite-trivy
+          path: trivy-report.html
+          retention-days: 5
