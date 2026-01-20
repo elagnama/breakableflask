@@ -130,3 +130,16 @@ jobs:
           with:
             name: rapport-audit-dockerfile
             path: rapport-dockerfile.md
+
+        - name: Publier le rapport dans le résumé
+          if: always()
+          run: |
+            cat rapport-dockerfile.md >> $GITHUB_STEP_SUMMARY
+
+        # 4. On garde quand même le fichier téléchargeable
+        - name: Upload de l'artefact
+          uses: actions/upload-artifact@v4
+          if: always()
+          with:
+            name: rapport-audit-dockerfile
+            path: rapport-dockerfile.md
